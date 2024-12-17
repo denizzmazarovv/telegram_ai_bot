@@ -25,35 +25,23 @@
 #     executor.start_polling(dp)
 # -------------------------------------------------------------------------------
 import os
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
 import logging
 import asyncio
-from aiogram.types import Message
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
-# Чтение токена из конфигурации
-TOKEN = os.getenv("BOT_TOKEN")  # Токен должен быть в переменной окружения или в config.json
+# Чтение токена из переменной окружения
+TOKEN = os.getenv("BOT_TOKEN")
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
-# Создание экземпляра бота и диспетчера
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-# Добавление middleware для логирования
-dp.middleware.setup(LoggingMiddleware())
-
-# Обработчик команды /start
-@dp.message_handler(commands=["start"])
+@dp.message_handler(commands=['start'])
 async def send_welcome(message: Message):
-    await message.reply("Добро пожаловать! Я ваш бот-консультант.")
-
-# Обработчик текстовых сообщений
-@dp.message_handler()
-async def echo(message: Message):
-    await message.answer(f"Вы написали: {message.text}")
+    await message.reply("Добро пожаловать! Я ваш бот.")
 
 # Новый способ запуска бота в aiogram 3.x
 async def on_start():
@@ -61,7 +49,7 @@ async def on_start():
         # Старт polling
         await dp.start_polling()
     except Exception as e:
-        logger.error(f"Error occurred: {e}")
+        logging.error(f"Error occurred: {e}")
 
 if __name__ == "__main__":
     # Запуск с использованием asyncio.run для асинхронной функции
