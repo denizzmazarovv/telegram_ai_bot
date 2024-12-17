@@ -25,6 +25,6 @@ async def on_start():
     except Exception as e:
         logging.error(f"Error occurred: {e}")
 
-if name == "__main__":
+if __name__ == "__main__":
     # Запуск с использованием asyncio.run для асинхронной функции
     asyncio.run(on_start())
