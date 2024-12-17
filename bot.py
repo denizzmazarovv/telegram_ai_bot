@@ -64,4 +64,4 @@ async def handle_message(message: Message):
 # Запуск бота
 if __name__ == "__main__":
     print("Бот запущен...")
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(on_start())
