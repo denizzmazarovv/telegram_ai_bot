@@ -1,8 +1,8 @@
 import os
 import logging
+import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
-import asyncio
 
 # Чтение токена из переменной окружения
 TOKEN = os.getenv("BOT_TOKEN")
@@ -25,6 +25,6 @@ async def on_start():
     except Exception as e:
         logging.error(f"Error occurred: {e}")
 
-if __name__ == "__main__":
+if name == "__main__":
     # Запуск с использованием asyncio.run для асинхронной функции
     asyncio.run(on_start())
