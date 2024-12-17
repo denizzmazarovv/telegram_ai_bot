@@ -24,44 +24,45 @@
 # if __name__ == "__main__":
 #     executor.start_polling(dp)
 # -------------------------------------------------------------------------------
-import json
+import os
 from aiogram import Bot, Dispatcher, types
+import logging
+import asyncio
 from aiogram.types import Message
-from aiogram.utils import executor
-from transformers import pipeline
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
 
-# Загружаем токен из config.json
-with open("config.json", "r") as config_file:
-    config = json.load(config_file)
-    TOKEN = config["token"]
+# Чтение токена из конфигурации
+TOKEN = os.getenv("BOT_TOKEN")  # Токен должен быть в переменной окружения или в config.json
 
-# Инициализация бота
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Создание экземпляра бота и диспетчера
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-# Загружаем AI-модель для вопрос-ответ
-qa_pipeline = pipeline("question-answering", model="bert-base-multilingual-cased")
+# Добавление middleware для логирования
+dp.middleware.setup(LoggingMiddleware())
 
-# Контекст для модели (замени на информацию о магазине)
-context = """
-В нашем магазине доступны размеры S, M и L. 
-Доставка осуществляется в течение 3 дней по городу. 
-Оплата принимается картой или наличными при получении.
-"""
+# Обработчик команды /start
+@dp.message_handler(commands=["start"])
+async def send_welcome(message: Message):
+    await message.reply("Добро пожаловать! Я ваш бот-консультант.")
 
-# Обработка сообщений
+# Обработчик текстовых сообщений
 @dp.message_handler()
-async def handle_message(message: Message):
-    user_question = message.text
-    try:
-        # Обработка вопроса с помощью AI-модели
-        result = qa_pipeline(question=user_question, context=context)
-        answer = result['answer']
-        await message.reply(answer)
-    except Exception as e:
-        await message.reply("Извините, я не понял ваш вопрос. Попробуйте иначе.")
+async def echo(message: Message):
+    await message.answer(f"Вы написали: {message.text}")
 
-# Запуск бота
+# Новый способ запуска бота в aiogram 3.x
+async def on_start():
+    try:
+        # Старт polling
+        await dp.start_polling()
+    except Exception as e:
+        logger.error(f"Error occurred: {e}")
+
 if __name__ == "__main__":
-    print("Бот запущен...")
+    # Запуск с использованием asyncio.run для асинхронной функции
     asyncio.run(on_start())
